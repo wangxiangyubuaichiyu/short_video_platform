@@ -1,16 +1,16 @@
 #include "Widget_Main.h"
 #include "ui_widget_main.h"
-#include "CVideo.h"
 
 #include <QPixmap>
+
 Widget_Main::Widget_Main(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget_Main)
 {
     ui->setupUi(this);
-    th=new MyThread;
-    connect(th, &MyThread::SIG_sand, this, &Widget_Main::SLT_show);
-    th->start();
+    m_play=new AVPlay;
+    connect(m_play, &AVPlay::SIG_GetOneImage, this, &Widget_Main::SLT_show);
+    m_play->start();
 }
 
 Widget_Main::~Widget_Main()

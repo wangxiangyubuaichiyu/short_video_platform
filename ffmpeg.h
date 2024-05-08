@@ -14,6 +14,7 @@ extern "C"
 #include <libavutil/avutil.h>
 //用于计算存储一张图像所需的最小缓冲区大小
 #include <libavutil/imgutils.h>
+//获取采样的库
 #include <libswresample/swresample.h>
 //SDL的使用库
 #include <SDL.h>

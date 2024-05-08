@@ -2,8 +2,8 @@
 #define WIDGET_MAIN_H
 
 #include <QWidget>
-#include <CVideo.h>
-#include "MyThread.h"
+#include "AVPlay.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget_Main; }
 QT_END_NAMESPACE
@@ -17,10 +17,10 @@ public:
     ~Widget_Main();
 
 private slots:
-    void SLT_show(QImage img);
+    void SLT_show(QImage img);   //展示到控件上
 
 private:
     Ui::Widget_Main *ui;
-    MyThread* th;
+    AVPlay* m_play;
 };
 #endif // WIDGET_MAIN_H

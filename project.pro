@@ -22,16 +22,14 @@ LIBS += $$PWD/ffmpeglib/lib/avcodec.lib \
 
 
 SOURCES += \
-    CAudio.cpp \
-    CVideo.cpp \
-    MyThread.cpp \
+    AVPlay.cpp \
+    PacketQueue.cpp \
     main.cpp \
     Widget_Main.cpp
 
 HEADERS += \
-    CAudio.h \
-    CVideo.h \
-    MyThread.h \
+    AVPlay.h \
+    PacketQueue.h \
     Widget_Main.h \
     ffmpeg.h
 
