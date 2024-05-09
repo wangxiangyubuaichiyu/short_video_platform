@@ -58,13 +58,14 @@ class AVPlay : public QThread
 public:
     explicit AVPlay(QObject *parent = nullptr);
     void run() override;
+    void SetFilePath(QString path);
 
 signals:
     void SIG_GetOneImage(QImage);                     //发给控件帧图片
     void finished();                                  // 信号可以在线程完成后发出
 
 public slots:
-    void SendGetOneImage(QImage img);
+    void SendGetOneImage(QImage img);                //发送每一帧图片
 
 private:
     VideoState m_videoState;

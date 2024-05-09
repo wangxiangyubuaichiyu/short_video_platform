@@ -10,7 +10,7 @@ int video_thread(void *arg);
 AVPlay::AVPlay(QObject *parent)
     : QThread{parent}
 {
-    m_fileName="E:\\Documents\\01.mp4";
+    m_fileName=" ";
 }
 void AVPlay::run()
 {
@@ -219,6 +219,11 @@ void AVPlay::run()
     avformat_close_input(&pFormatCtx);
     av_free( m_videoState.audioFrame );
     m_videoState.audioFrame = NULL;
+}
+
+void AVPlay::SetFilePath(QString path)
+{
+    m_fileName=path;
 }
 void AVPlay::SendGetOneImage(QImage img)
 {
