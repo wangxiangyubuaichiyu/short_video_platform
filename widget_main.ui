@@ -263,26 +263,26 @@
       <x>600</x>
       <y>20</y>
       <width>420</width>
-      <height>50</height>
+      <height>52</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
       <width>420</width>
-      <height>50</height>
+      <height>52</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
       <width>420</width>
-      <height>50</height>
+      <height>52</height>
      </size>
     </property>
     <widget class="QLineEdit" name="let_search">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>0</y>
+       <x>5</x>
+       <y>1</y>
        <width>320</width>
        <height>50</height>
       </rect>
@@ -313,7 +313,7 @@
      <property name="geometry">
       <rect>
        <x>325</x>
-       <y>0</y>
+       <y>1</y>
        <width>95</width>
        <height>50</height>
       </rect>
@@ -528,7 +528,7 @@
     </size>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="wdg_home">
     <property name="minimumSize">
@@ -562,20 +562,20 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>1370</width>
-       <height>770</height>
+       <width>1375</width>
+       <height>875</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>1370</width>
-       <height>770</height>
+       <width>1375</width>
+       <height>875</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>1370</width>
-       <height>770</height>
+       <width>1375</width>
+       <height>875</height>
       </size>
      </property>
      <property name="text">
@@ -598,8 +598,8 @@
     <widget class="QToolButton" name="btn_open">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>800</y>
+       <x>0</x>
+       <y>790</y>
        <width>31</width>
        <height>31</height>
       </rect>
@@ -612,7 +612,7 @@
      <property name="geometry">
       <rect>
        <x>1290</x>
-       <y>800</y>
+       <y>790</y>
        <width>80</width>
        <height>24</height>
       </rect>

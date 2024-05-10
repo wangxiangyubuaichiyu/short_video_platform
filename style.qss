@@ -121,3 +121,20 @@ QWidget#search *
     /* 使search及其所有子控件透明 */
     background-color: rgba(0, 0, 0, 0);
 }
+QPushButton#btn_search
+{
+    /* 矩形右上角和右下角有弧度  */
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+/*播放器设置*/
+QWidget#wdg_play
+{
+    /* 矩形四角有弧度 */
+    border-radius: 20px;
+}
+QLabel#lb_palyer
+{
+    /* 矩形四角有弧度 */
+    border-radius: 20px;
+}
