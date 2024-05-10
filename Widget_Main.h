@@ -30,6 +30,7 @@ private slots:
     void on_btn_home_clicked(); //首页
     void on_btn_user_clicked(); //播放页
     void on_btn_play_clicked(); //用户页
+    void on_btn_open_clicked(); //播放与暂停按钮
 
 private:
     Ui::MainWindow *ui;  //ui界面

@@ -10,5 +10,10 @@
         <file>image/contribute2.png</file>
         <file>image/search1.png</file>
         <file>image/search2.png</file>
+        <file>image/home.png</file>
+        <file>image/my.png</file>
+        <file>image/play.png</file>
+        <file>style.qss</file>
+        <file>image/set.png</file>
     </qresource>
 </RCC>

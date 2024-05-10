@@ -1,0 +1,123 @@
+﻿/*主界面*/
+QWidget#MainWindow
+{
+    /*背景颜色*/
+    background-color: rgb(22,24,35);
+}
+
+/*Navigation中的QToolButton样式*/
+QWidget#Navigation QToolButton
+{
+    /* 背景透明 */
+    background-color: transparent;
+    /* 字体颜色 */
+    color: rgb(163, 163, 167);
+    /* 矩形四角有弧度 */
+    border-radius: 15px;
+    /* 文字居中 */
+    padding-left:25px;
+}
+QWidget#Navigation QToolButton:hover
+{
+    /* 鼠标悬停时的样式 */
+    background-color: rgb(48, 41, 53);
+    /* 字体颜色 */
+    color: white;
+}
+/*设置按键*/
+QToolButton#btn_set
+{
+     /* 背景透明 */
+    background-color: transparent;
+    /* 字体颜色 */
+    color: rgb(163, 163, 167);
+    /* 文字居中 */
+    padding-left:25px;
+    /* 显示上边框 */
+    border-top: 1px solid rgb(39,41,51);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+}
+QToolButton#btn_set:hover
+{
+    /* 字体颜色 */
+    color: white;
+}
+/*mange内的QToolButton*/
+QWidget#mange QToolButton
+{
+    /* 背景透明 */
+    background-color: transparent;
+    /* 文字居中 */
+    padding-left:25px;
+}
+QWidget#mange QToolButton:hover
+{
+    /* 鼠标悬停时的样式 */
+    background-color: rgb(48, 41, 53);
+}
+/*mange左边框*/
+QWidget#mange
+{
+     /* 底边框为白色，大小为2px */
+    border-left: 1px solid rgb(39,41,51);
+    /* 其他三边隐藏 */
+    border-bottom: none;
+    border-right: none;
+    border-top: none;
+}
+/*投稿按键*/
+QToolButton#btn_contribute
+{
+     /* 背景透明 */
+    background-color: transparent;
+    /* 字体颜色 */
+    color: rgb(163, 163, 167);
+    /* 矩形四角有弧度 */
+    border-radius: 15px;
+}
+QToolButton#btn_contribute:hover
+{
+    /* 鼠标悬停时的样式 */
+    background-color: rgb(48, 41, 53);
+    /* 字体颜色 */
+    color: white;
+}
+/*登录按键*/
+QToolButton#btn_log
+{
+     /* 背景透明 */
+    background-color: transparent;
+    /* 字体颜色 */
+    color: rgb(163, 163, 167);
+    /* 矩形四角有弧度 */
+    border-radius: 15px;
+}
+QToolButton#btn_log:hover
+{
+    /* 鼠标悬停时的样式 */
+    background-color: rgb(48, 41, 53);
+    /* 字体颜色 */
+    color: white;
+}
+/*搜索框*/
+QWidget#search
+{
+    /* 矩形四角有弧度 */
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0);
+    border: 2px solid rgb(186, 186, 189);
+}
+QWidget#search *
+{
+    /* 移除边框 */
+    border: none;
+    /* 字体颜色 */
+    color: white;
+    /* 使search及其所有子控件透明 */
+    background-color: rgba(0, 0, 0, 0);
+}

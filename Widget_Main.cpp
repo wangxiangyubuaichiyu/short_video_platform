@@ -1,34 +1,51 @@
 #include "Widget_Main.h"
 #include "ui_widget_main.h"
 
+#include <QFile>
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QScreen>
+#include <qDebug>
 
 Widget_Main::Widget_Main(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    m_play=new AVPlay;
-    connect(m_play, &AVPlay::SIG_GetOneImage, this, &Widget_Main::SLT_show); //连接播放器
 
     setWindowFlags(Qt::FramelessWindowHint);        // 隐藏标题栏和边框
     on_btn_big_clicked();                           //窗口放中间
-
+    QFile file(":/style.qss");
+    file.open(QFile::ReadOnly | QFile::Text);
+    QTextStream in(&file);
+    setStyleSheet(in.readAll());                //读取qss并设置样式表
 
     //投稿 上面图案下面文字
-    ui->btn_contribute->setIcon(QIcon(":/image/contribute1.png"));
+    ui->btn_contribute->setIcon(QIcon(":/image/contribute2.png"));
     ui->btn_contribute->setText(QString::fromLocal8Bit("投稿"));             //如果是乱码就会显示 ...
     ui->btn_contribute->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
+    //home 左边图案右边文字
+    ui->btn_home->setIcon(QIcon(":/image/home.png"));
+    ui->btn_home->setText(QString::fromLocal8Bit("首页"));
+    ui->btn_home->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->btn_home->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");     //最开始在home窗口
+    //my 左边图案右边文字
+    ui->btn_user->setIcon(QIcon(":/image/my.png"));
+    ui->btn_user->setText(QString::fromLocal8Bit("我的"));
+    ui->btn_user->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    //paly 左边图案右边文字
+    ui->btn_play->setIcon(QIcon(":/image/play.png"));
+    ui->btn_play->setText(QString::fromLocal8Bit("播放"));
+    ui->btn_play->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    //set 左边图案右边文字
+    ui->btn_set->setIcon(QIcon(":/image/set.png"));
+    ui->btn_set->setText(QString::fromLocal8Bit("设置"));
+    ui->btn_set->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     //搜索 左边图案后面文字
-    ui->btn_search->setIcon(QIcon(":/image/search1.png"));
-    ui->btn_search->setText(QString::fromLocal8Bit("搜索"));             //如果是乱码就会显示 ...
-
-    //开启线程
-    //m_play->SetFilePath(" ");
-    //m_play->start();
+    ui->btn_search->setIcon(QIcon(":/image/search2.png"));
+    ui->btn_search->setText(QString::fromLocal8Bit("搜索"));
+    // 设置提示文本
+    ui->let_search->setPlaceholderText(QString::fromLocal8Bit("搜索你感兴趣的内容"));
 }
 
 Widget_Main::~Widget_Main()
@@ -39,10 +56,10 @@ Widget_Main::~Widget_Main()
 void Widget_Main::SLT_show(QImage img)
 {
     QPixmap pixmap = QPixmap::fromImage(img);// 使用 QImage 创建 QPixmap
-    //pixmap = pixmap.scaled(ui->lb_vid->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation); // 缩放图片以适应 QLabel 的大小
+    pixmap = pixmap.scaled(ui->lb_palyer->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation); // 缩放图片以适应 QLabel 的大小
 
-    //ui->lb_vid->setPixmap(pixmap); // 设置 QLabel 的 pixmap 属性
-    //ui->lb_vid->update(); // 更新 QLabel 以显示新的 pixmap
+    ui->lb_palyer->setPixmap(pixmap); // 设置 QLabel 的 pixmap 属性
+    ui->lb_palyer->update(); // 更新 QLabel 以显示新的 pixmap
 }
 
 void Widget_Main::mousePressEvent(QMouseEvent *event)
@@ -73,12 +90,10 @@ void Widget_Main::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-
 void Widget_Main::on_btn_close_clicked()
 {
     this->close();
 }
-
 
 void Widget_Main::on_btn_big_clicked()
 {
@@ -102,28 +117,40 @@ void Widget_Main::on_btn_big_clicked()
     setGeometry(x, y, windowWidth, windowHeight);
 }
 
-
 void Widget_Main::on_btn_small_clicked()
 {
     this->showMinimized();
 }
 
-
 void Widget_Main::on_btn_home_clicked()
 {
     ui->ShwoWindow->setCurrentIndex(0);
+    ui->btn_home->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
+    ui->btn_play->setStyleSheet("background-color: transparent;");
+    ui->btn_user->setStyleSheet("background-color: transparent;");
 }
 
 void Widget_Main::on_btn_play_clicked()
 {
     ui->ShwoWindow->setCurrentIndex(1);
+    ui->btn_play->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
+    ui->btn_home->setStyleSheet("background-color: transparent;");
+    ui->btn_user->setStyleSheet("background-color: transparent;");
 }
 
 void Widget_Main::on_btn_user_clicked()
 {
     ui->ShwoWindow->setCurrentIndex(2);
+    ui->btn_user->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
+    ui->btn_play->setStyleSheet("background-color: transparent;");
+    ui->btn_home->setStyleSheet("background-color: transparent;");
 }
 
-
-
+void Widget_Main::on_btn_open_clicked()
+{
+    AVPlay* play=new AVPlay;
+    connect(play, &AVPlay::SIG_GetOneImage, this, &Widget_Main::SLT_show); //连接播放器
+    play->SetFilePath("E:\\Documents\\01.mp4");
+    play->start();
+}
 
