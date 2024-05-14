@@ -24,6 +24,7 @@ QWidget#Navigation QToolButton:hover
     /* 字体颜色 */
     color: white;
 }
+
 /*设置按键*/
 QToolButton#btn_set
 {
@@ -47,6 +48,7 @@ QToolButton#btn_set:hover
     /* 字体颜色 */
     color: white;
 }
+
 /*mange内的QToolButton*/
 QWidget#mange QToolButton
 {
@@ -60,6 +62,7 @@ QWidget#mange QToolButton:hover
     /* 鼠标悬停时的样式 */
     background-color: rgb(48, 41, 53);
 }
+
 /*mange左边框*/
 QWidget#mange
 {
@@ -70,6 +73,7 @@ QWidget#mange
     border-right: none;
     border-top: none;
 }
+
 /*投稿按键*/
 QToolButton#btn_contribute
 {
@@ -87,6 +91,7 @@ QToolButton#btn_contribute:hover
     /* 字体颜色 */
     color: white;
 }
+
 /*登录按键*/
 QToolButton#btn_log
 {
@@ -104,6 +109,7 @@ QToolButton#btn_log:hover
     /* 字体颜色 */
     color: white;
 }
+
 /*搜索框*/
 QWidget#search
 {
@@ -127,6 +133,7 @@ QPushButton#btn_search
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
 }
+
 /*播放器设置*/
 QWidget#wdg_play
 {
@@ -137,4 +144,72 @@ QLabel#lb_palyer
 {
     /* 矩形四角有弧度 */
     border-radius: 20px;
+}
+
+/*设置暂停与开始键*/
+QToolButton#btn_open
+{
+    /* 按键设置为透明 */
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/*设置点击切换上下视频*/
+QWidget#up_and_down
+{
+    /* 矩形四角有弧度 */
+    border-radius: 25px;
+    /* 背景颜色 */
+    background-color: rgb(48,49,61);
+}
+
+/*up_and_down中的QToolButton样式*/
+QWidget#up_and_down QToolButton
+{
+    /* 按键设置为透明 */
+    background-color: rgba(0, 0, 0, 0);
+}
+/* 首先是设置主体 */
+QSlider
+{
+    border-color: #bcbcbc;
+}
+QSlider::groove:horizontal
+{
+    border: 1px solid #999999;
+    height: 0px;
+    margin: 0px 0;
+    left: 5px; right: 5px;
+}
+QSlider::groove:horizontal:hover
+{
+    height: 3px;
+}
+/* 设置中间的那个滑动的键 */
+QSlider::handle:horizontal
+{
+    border: 0px ;
+    border-image:transparent;
+    width: 15px;
+    margin: -7px -7px -7px -7px;
+}
+QSlider::handle:horizontal:hover
+{
+    border: 0px ;
+    border-image:  url(:/image/sliding_block.png);
+    margin: -7px -7px -7px -7px;
+}
+/* 还没有滑上去的地方 */
+QSlider::add-page:horizontal
+{
+    background: #bcbcbc;
+}
+/* 已经划过的从地方 */
+QSlider::sub-page:horizontal
+{
+    background: #ffffff;
+}
+/*时间控件*/
+QLabel#lb_totalTime,#lb_currentTime
+{
+    color:white;
 }

@@ -25,13 +25,17 @@ SOURCES += \
     AVPlay.cpp \
     PacketQueue.cpp \
     main.cpp \
-    Widget_Main.cpp
+    Widget_Main.cpp \
+    myslider.cpp \
+    switchcontrol.cpp
 
 HEADERS += \
     AVPlay.h \
     PacketQueue.h \
     Widget_Main.h \
-    ffmpeg.h
+    ffmpeg.h \
+    myslider.h \
+    switchcontrol.h
 
 FORMS += \
     widget_main.ui

@@ -15,5 +15,9 @@
         <file>image/play.png</file>
         <file>style.qss</file>
         <file>image/set.png</file>
+        <file>image/Play _big.png</file>
+        <file>image/stop.png</file>
+        <file>image/next.png</file>
+        <file>image/sliding_block.png</file>
     </qresource>
 </RCC>
