@@ -161,13 +161,13 @@ QWidget#up_and_down
     /* 背景颜色 */
     background-color: rgb(48,49,61);
 }
-
 /*up_and_down中的QToolButton样式*/
 QWidget#up_and_down QToolButton
 {
     /* 按键设置为透明 */
     background-color: rgba(0, 0, 0, 0);
 }
+
 /* 首先是设置主体 */
 QSlider
 {
@@ -213,3 +213,4 @@ QLabel#lb_totalTime,#lb_currentTime
 {
     color:white;
 }
+

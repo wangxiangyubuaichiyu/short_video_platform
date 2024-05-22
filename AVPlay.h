@@ -40,6 +40,7 @@ struct VideoState
     int videoStream;                        //视频音频流索引
     double video_clock;                     //<pts of last decoded frame 视频时钟
     SDL_Thread *video_tid;                  //视频线程 id
+    SDL_TimerID timer_id;                   //无声时定时器id
 
     // 播放控制的变量
     bool isPause;                           //暂停标志

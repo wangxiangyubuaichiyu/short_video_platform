@@ -42,6 +42,8 @@ private slots:
     void on_btn_play_clicked();                 //用户页
     void on_btn_open_clicked();                 //播放与暂停按钮
 
+    void on_btn_set_clicked();
+
 private:
     Ui::MainWindow *ui;                 //ui界面
     AVPlay* m_play;                     //播放器

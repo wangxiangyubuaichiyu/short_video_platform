@@ -528,7 +528,7 @@
     </size>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="wdg_home">
     <property name="minimumSize">
@@ -543,6 +543,28 @@
       <height>847</height>
      </size>
     </property>
+    <widget class="MyListWidget" name="lw_recommendlist">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1415</width>
+       <height>875</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>1415</width>
+       <height>875</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>1415</width>
+       <height>875</height>
+      </size>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="wdg_play">
     <property name="minimumSize">
@@ -972,6 +994,11 @@
    <class>Myslider</class>
    <extends>QSlider</extends>
    <header>myslider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyListWidget</class>
+   <extends>QListWidget</extends>
+   <header>mylistwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

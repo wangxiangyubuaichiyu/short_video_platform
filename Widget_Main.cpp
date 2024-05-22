@@ -3,6 +3,7 @@
 
 #include <QEvent>
 #include <QFile>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -220,6 +221,13 @@ void Widget_Main::slot_PlayerStateChanged(int state)
     switch( state )
     {
     case AVPlay::PlayerState::Pause:
+    {
+        ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
+        m_timer.stop();
+        this->update();
+        isStop = true;
+        break;
+    }
     case AVPlay::PlayerState::Stop:
     {
         ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
@@ -339,18 +347,6 @@ void Widget_Main::on_btn_user_clicked()
 
 void Widget_Main::on_btn_open_clicked()
 {
-//    if(m_play->playerState()!=AVPlay::PlayerState::Stop)
-//    {
-//        m_play->stop(true);
-//    }
-//    else
-//    {
-//        //判断文件是否存在
-//        //余着
-//        m_play->SetFilePath("E:\\Documents\\02.mp4");
-//        //切换状态
-//        slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
-//    }
     //如果是暂停，或者停止(没有文件加载)
     if(m_play->playerState()==AVPlay::PlayerState::Pause||m_play->playerState()==AVPlay::PlayerState::Stop)
     {
@@ -358,7 +354,7 @@ void Widget_Main::on_btn_open_clicked()
         if(m_play->playerState()==AVPlay::PlayerState::Stop)
         {
             //m_play->SetFilePath("E:\\Documents\\02.mp4");    //用于测试 后期连播等，需要重写
-            m_play->SetFilePath("rtmp://192.168.194.131:1935/vod/1.mp4");//点播
+            m_play->SetFilePath("rtmp://192.168.194.131:1935/vod/7.mp4");//点播
         }
         //切换状态
         slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
@@ -369,5 +365,11 @@ void Widget_Main::on_btn_open_clicked()
        //切换状态
        slot_PlayerStateChanged(AVPlay::PlayerState::Pause);
     }
+}
+
+void Widget_Main::on_btn_set_clicked()
+{
+    QMessageBox::about(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("设置界面仍处于更新状态，后续可能会进行完成，也可能不了了之了"));
+
 }
 

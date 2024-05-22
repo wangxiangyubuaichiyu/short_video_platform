@@ -26,6 +26,7 @@ SOURCES += \
     PacketQueue.cpp \
     main.cpp \
     Widget_Main.cpp \
+    mylistwidget.cpp \
     myslider.cpp \
     switchcontrol.cpp
 
@@ -34,6 +35,7 @@ HEADERS += \
     PacketQueue.h \
     Widget_Main.h \
     ffmpeg.h \
+    mylistwidget.h \
     myslider.h \
     switchcontrol.h
 

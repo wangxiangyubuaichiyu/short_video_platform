@@ -104,8 +104,8 @@ void AVPlay::run()
             double fps = av_q2d(m_videoState.video_st->r_frame_rate);
             double pts_diff = 1/ fps ;
             //获取画面的间隔时间
-            SDL_TimerID timer_id = SDL_AddTimer( pts_diff*1000, timer_callback, &m_videoState);
-            if (timer_id == 0)
+            m_videoState.timer_id = SDL_AddTimer( pts_diff*1000, timer_callback, &m_videoState);
+            if (m_videoState.timer_id == 0)
             {
                 fprintf(stderr, "SDL_AddTimer Error: %s\n", SDL_GetError());
                 return;
@@ -347,8 +347,13 @@ void AVPlay::stop(bool isWait)
     m_videoState .quit = 1;
     if( isWait ) //阻塞标志
     {
-        while(!m_videoState.readThreadFinished )//等待读取线程退出
+        while(m_videoState.readThreadFinished==-1&&(!m_videoState.readThreadFinished) )//等待读取线程退出
         {
+            if(m_videoState.audioStream==-1)
+            {
+                SDL_RemoveTimer(m_videoState.timer_id);
+                m_videoState.videoThreadFinished=true;
+            }
             SDL_Delay(10);
         }
     }
@@ -592,7 +597,8 @@ Uint32 timer_callback(Uint32 interval, void *param)
                    pCodecCtx->width, pCodecCtx->height);
     do
     {
-        if (packet_queue_get(is->videoq, packet, 1) <= 0) break;        //队列里面没有数据了
+        if(is->quit)break;
+        if (packet_queue_get(is->videoq, packet, 0) <= 0) break;        //队列里面没有数据了
         ret = avcodec_decode_video2(pCodecCtx, pFrame, &got_picture,packet);
         if (ret < 0)
         {
