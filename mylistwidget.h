@@ -4,9 +4,9 @@
 #include <QWidget>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <QGridLayout>
 #include <QLabel>
 #include <QVector>
+#include "vilist.h"
 
 class MyListWidget : public QScrollArea
 {
@@ -16,19 +16,28 @@ public:
     MyListWidget(QWidget *parent = nullptr);
     ~MyListWidget();
 
-private:
-    void addItemWidget(QWidget *item);     // 添加自定义 QWidget 函数
-private slots:
-    void onScrollValueChanged(int value);  // 滚动条数值变化槽函数
-    void loadMoreItems();                  // 加载更多自定义 QWidget 槽函数
+protected:
+    void resizeEvent(QResizeEvent *event) override;   // 重写resizeEvent处理窗口尺寸改变事件
+    void updateContainerSize();                       // 更新容器大小以适应内容
+
+signals:
+    void getList(ViList*& list);                      // 发出信号以获取链表
+    void needList();                                  // 当需要更多列表数据时发出信号
 
 private:
-    QVBoxLayout *mainLayout;              // 主布局，用于垂直排列所有行
-    QGridLayout *currentRowLayout;        // 当前行的布局
-    int currentColumn;                    // 当前列号
-    QVector<int> columnHeights;           // 列高度列表
-    int columnCount = 4;                  // 列数
-    int itemSpacing = 20;                 // 项目间距
+    void addItemWidget(QWidget *item);                // 向容器中添加单个小部件
+
+public slots:
+    void onScrollValueChanged(int value);             // 滚动条值变化时的处理槽函数
+    void loadMoreItems();                             // 加载更多项目到列表
+
+private:
+    QWidget *containerWidget;                         // 用于承载列表项的容器
+    QVector<int> columnHeights;                       // 存储每一列的当前高度
+    int columnCount = 4;                              // 列数，默认为4
+    int itemSpacing = 20;                             // 项目之间的间隔
+    int itemWidth = 335;                              // 每个项目的宽度
+    int len = 0;                                      // 记录已加载的项目数量
 };
 
 #endif // MYLISTWIDGET_H

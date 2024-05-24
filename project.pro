@@ -24,20 +24,24 @@ LIBS += $$PWD/ffmpeglib/lib/avcodec.lib \
 SOURCES += \
     AVPlay.cpp \
     PacketQueue.cpp \
+    json.cpp \
     main.cpp \
     Widget_Main.cpp \
     mylistwidget.cpp \
     myslider.cpp \
-    switchcontrol.cpp
+    switchcontrol.cpp \
+    vilist.cpp
 
 HEADERS += \
     AVPlay.h \
     PacketQueue.h \
     Widget_Main.h \
     ffmpeg.h \
+    json.h \
     mylistwidget.h \
     myslider.h \
-    switchcontrol.h
+    switchcontrol.h \
+    vilist.h
 
 FORMS += \
     widget_main.ui

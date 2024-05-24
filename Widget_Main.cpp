@@ -3,6 +3,7 @@
 
 #include <QEvent>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
@@ -80,6 +81,20 @@ Widget_Main::Widget_Main(QWidget *parent)
     connect(ui->sl_progree ,&Myslider::SIG_valueChanged,this,&Widget_Main::slot_videoSliderValueChanged);
     connect(&m_timer,&QTimer::timeout,this,&Widget_Main::slot_TimerTimeOut);
     m_timer.setInterval(500);                                                 //超时时间500ms
+    m_list=new ViList;
+    m_js=new Json;
+    connect(m_js,&Json::dataEncoded,this,&Widget_Main::sendDate);               //封装好数据要发送给服务端
+    connect(m_js,&Json::dataDecoded,this,&Widget_Main::addList);                //解析好数据要放到链表中
+    //加载视频需要4的倍数
+    for(int i=1;i<=20;i++)//测试性放12个url
+    {
+        m_js->decodeData(QString("{\"url\":\"rtmp://192.168.194.131:1935/vod/%1.mp4\"}").arg(i));
+    }
+    //先加载控件再运行主程序的，所以刚加载的时候MyListWidget::header是空的，所以放到主窗口进行初始化。
+    connect(ui->lw_recommendlist,&MyListWidget::getList,this,[&](ViList*& list){//获取到链表
+        list=m_list;
+    });
+    ui->lw_recommendlist->loadMoreItems();
 }
 
 Widget_Main::~Widget_Main()
@@ -99,19 +114,20 @@ QPixmap Widget_Main::roundImage(const QPixmap &src, int radius)
     QPainter painter(&rounded);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // 创建圆角路径，只保留左上角和右上角->有时间可以实现一下
-    //QPainterPath path;
-    //path.moveTo(src.width(), src.height());
-    //path.lineTo(src.width(), 0);
-    //path.arcTo(QRectF(0, 0, radius * 2, radius * 2), 90.0, -90.0);
-    //path.lineTo(src.width() - radius, src.height());
-    //path.arcTo(QRectF(src.width() - radius * 2, 0, radius * 2, radius * 2), 0.0, -90.0);
-    //path.lineTo(0, src.height());
-    //path.closeSubpath();
-    // 创建圆角路径
+    // 创建路径 只有左上角和右上角修改为圆角
     QPainterPath path;
-    path.addRoundedRect(rounded.rect(), radius, radius);
+    path.moveTo(radius, 0);                                                        //从左上角向右移动到圆角的起点。
+    path.lineTo(rounded.width() - radius, 0);                                      //从起点画一条水平线到右上角的圆角起点。
+    path.arcTo(rounded.width() - 2 * radius, 0, 2 * radius, 2 * radius, 90, -90);  //画一个圆弧到右上角。
+    path.lineTo(rounded.width(), rounded.height());                                //从右上角的圆弧终点画一条垂直线到右下角。
+    path.lineTo(0, rounded.height());                                              //从右下角画一条水平线到左下角。
+    path.lineTo(0, radius);                                                        //从左下角画一条垂直线到左上角的圆角起点。
+    path.arcTo(0, 0, 2 * radius, 2 * radius, 180, -90);                            //画一个圆弧到左上角。
+    path.closeSubpath();                                                           //闭合路径。
 
+    // 创建圆角路径
+    //QPainterPath path;
+    //path.addRoundedRect(rounded.rect(), radius, radius);
     // 设置剪裁区域
     painter.setClipPath(path);
     painter.setRenderHints(QPainter::Antialiasing);         //抗锯齿
@@ -119,6 +135,95 @@ QPixmap Widget_Main::roundImage(const QPixmap &src, int radius)
     painter.drawPixmap(rounded.rect(), src);
 
     return rounded;
+}
+
+QImage Widget_Main::getFirstImage(QString filePath)
+{
+    AVFormatContext *pFormatCtx = nullptr;
+    int videoStreamIndex = -1;
+    AVCodecContext *pCodecCtx = nullptr;
+    AVFrame *pFrame = nullptr;
+    AVFrame *pFrameRGB = nullptr;
+    AVPacket packet;
+    struct SwsContext *sws_ctx = nullptr;
+    QImage image;
+
+    av_register_all();
+
+    if (avformat_open_input(&pFormatCtx, filePath.toStdString().c_str(), nullptr, nullptr) != 0)
+    {
+        qDebug() << "Couldn't open file.";
+        return image;
+    }
+
+    if (avformat_find_stream_info(pFormatCtx, nullptr) < 0)
+    {
+        qDebug() << "Couldn't find stream information.";
+        avformat_close_input(&pFormatCtx);
+        return image;
+    }
+
+    videoStreamIndex = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+    AVCodecParameters *pCodecPar = pFormatCtx->streams[videoStreamIndex]->codecpar;
+    AVCodec *pCodec = avcodec_find_decoder(pCodecPar->codec_id);
+    pCodecCtx = avcodec_alloc_context3(pCodec);
+    avcodec_parameters_to_context(pCodecCtx, pCodecPar);
+    avcodec_open2(pCodecCtx, pCodec, nullptr);
+    pFrame = av_frame_alloc();
+    pFrameRGB = av_frame_alloc();
+    int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height, 1);
+    uint8_t *buffer = (uint8_t *)av_malloc(numBytes * sizeof(uint8_t));
+    av_image_fill_arrays(pFrameRGB->data, pFrameRGB->linesize, buffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height, 1);
+
+    sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
+                             pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB24,
+                             SWS_BILINEAR, nullptr, nullptr, nullptr);
+
+    //取第一帧可能有问题，所以需要取到第一张图片才能结束。
+    while (av_read_frame(pFormatCtx, &packet) >= 0)
+    {
+        if (packet.stream_index == videoStreamIndex)
+        {
+            if (avcodec_send_packet(pCodecCtx, &packet) == 0)
+            {
+                if (avcodec_receive_frame(pCodecCtx, pFrame) == 0)
+                {
+                    sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize,
+                              0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
+                    image = QImage(pFrameRGB->data[0], pCodecCtx->width, pCodecCtx->height, QImage::Format_RGB888).copy();
+                    break; // 只需要第一帧
+                }
+            }
+        }
+        av_packet_unref(&packet);
+    }
+
+    av_free(buffer);
+    av_frame_free(&pFrame);
+    av_frame_free(&pFrameRGB);
+    avcodec_free_context(&pCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    sws_freeContext(sws_ctx);
+    return image;
+}
+
+QString Widget_Main::getFilename(const QString &filePath)
+{
+    //加载库
+    av_register_all();
+
+    //获取名字
+    AVFormatContext *formatContext = avformat_alloc_context();
+    avformat_open_input(&formatContext, filePath.toStdString().c_str(), nullptr, nullptr);
+    avformat_find_stream_info(formatContext, nullptr);
+    QString url = QString::fromUtf8(formatContext->url);
+    QFileInfo fileInfo(url);
+    QString filename = fileInfo.fileName();
+
+    //卸载库
+    avformat_close_input(&formatContext);
+    avformat_free_context(formatContext);
+    return filename;
 }
 
 void Widget_Main::mousePressEvent(QMouseEvent *event)
@@ -214,6 +319,24 @@ void Widget_Main::SLT_show(QImage img)
     pixmap = pixmap.scaled(ui->lb_palyer->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation); // 缩放图片以适应 QLabel 的大小
     ui->lb_palyer->setAlignment(Qt::AlignHCenter|Qt::AlignTop);//水平居中，垂直向上
     ui->lb_palyer->setPixmap(pixmap);                   // 设置 QLabel 的 pixmap 属性
+}
+
+void Widget_Main::addList(const QMap<QString, QVariant> &data)
+{
+    QString url=data["url"].toString();
+    VNode* p=new VNode;
+    p->url=url;
+    p->name=getFilename(url);
+    p->FirstImage=QPixmap::fromImage(getFirstImage(url));
+    p->FirstImage = roundImage(p->FirstImage, 20);             // 20为圆角半径
+    p->Id=num++;
+    p->next=NULL;
+    m_list->push_back(p);
+}
+
+void Widget_Main::sendDate(const QString &json)
+{
+    //qDebug() << json;
 }
 
 void Widget_Main::slot_PlayerStateChanged(int state)
@@ -354,7 +477,7 @@ void Widget_Main::on_btn_open_clicked()
         if(m_play->playerState()==AVPlay::PlayerState::Stop)
         {
             //m_play->SetFilePath("E:\\Documents\\02.mp4");    //用于测试 后期连播等，需要重写
-            m_play->SetFilePath("rtmp://192.168.194.131:1935/vod/7.mp4");//点播
+            m_play->SetFilePath("rtmp://192.168.194.131:1935/vod/10.mp4");//点播
         }
         //切换状态
         slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
@@ -370,6 +493,5 @@ void Widget_Main::on_btn_open_clicked()
 void Widget_Main::on_btn_set_clicked()
 {
     QMessageBox::about(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("设置界面仍处于更新状态，后续可能会进行完成，也可能不了了之了"));
-
 }
 

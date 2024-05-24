@@ -555,13 +555,13 @@
      <property name="minimumSize">
       <size>
        <width>1415</width>
-       <height>875</height>
+       <height>847</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>1415</width>
-       <height>875</height>
+       <height>847</height>
       </size>
      </property>
     </widget>

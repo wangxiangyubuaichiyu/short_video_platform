@@ -7,7 +7,8 @@
 #include <QWidget>
 #include "AVPlay.h"
 #include "switchcontrol.h"
-
+#include "vilist.h"
+#include "json.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -20,8 +21,10 @@ public:
     Widget_Main(QWidget *parent = nullptr);
     ~Widget_Main();
     QPixmap roundImage(const QPixmap &src, int radius);// 函数用于绘制圆角的图片
-
+    QImage getFirstImage(QString filePath);            //获取第一帧画面
+    QString getFilename(const QString &filePath);   //获取视频名字
 protected:
+    //重写事件
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -30,6 +33,8 @@ protected:
 
 private slots:
     void SLT_show(QImage img);                  //展示到控件上
+    void addList(const QMap<QString, QVariant>& data);//获取数据
+    void sendDate(const QString& json);         //发送数据
     void slot_PlayerStateChanged(int state);    //状态切换
     void slot_getTotalTime(qint64 uSec);        //获取视频全部时间
     void slot_TimerTimeOut();                   //获取当前视频时间定时器
@@ -41,9 +46,7 @@ private slots:
     void on_btn_user_clicked();                 //播放页
     void on_btn_play_clicked();                 //用户页
     void on_btn_open_clicked();                 //播放与暂停按钮
-
-    void on_btn_set_clicked();
-
+    void on_btn_set_clicked();                  //设置界面
 private:
     Ui::MainWindow *ui;                 //ui界面
     AVPlay* m_play;                     //播放器
@@ -53,5 +56,8 @@ private:
     SwitchControl* m_swtc;              //连播按钮
     int isStop;                         //暂停状态
     QTimer m_timer;                     //定时器
+    ViList* m_list;                     //视频存放列表
+    Json* m_js;                         //json解析器
+    int num=0;                          //视频数量
 };
 #endif // WIDGET_MAIN_H
