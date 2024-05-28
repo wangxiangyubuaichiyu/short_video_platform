@@ -1,18 +1,19 @@
-#include "Widget_Main.h"
 #include "ui_widget_main.h"
+#include "Widget_Main.h"
 
-#include <QEvent>
-#include <QFile>
-#include <QFileInfo>
+#include <QPainterPath>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QFileInfo>
 #include <QPainter>
-#include <QPainterPath>
 #include <QPalette>
 #include <QPixmap>
 #include <QScreen>
-#include <QSize>
 #include <qDebug>
+#include <QEvent>
+#include <QSize>
+#include <QFile>
+
 
 Widget_Main::Widget_Main(QWidget *parent)
     : QWidget(parent)
@@ -581,6 +582,7 @@ void Widget_Main::on_lb_on_clicked()
 
     m_play->stop(true);
     slot_PlayerStateChanged(AVPlay::PlayerState::Stop);
+    ui->lb_pause->hide();
 
     m_NowNode=m_list->check(m_NowNode->Id-1);
     m_play->SetFilePath(m_NowNode->url);
@@ -592,6 +594,7 @@ void Widget_Main::on_lb_down_clicked()
 {
     m_play->stop(true);
     slot_PlayerStateChanged(AVPlay::PlayerState::Stop);
+    ui->lb_pause->hide();
 
     if(m_NowNode->next==NULL)
     {

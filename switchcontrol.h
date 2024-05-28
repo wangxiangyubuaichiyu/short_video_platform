@@ -1,8 +1,8 @@
 #ifndef SWITCHCONTROL_H
 #define SWITCHCONTROL_H
 
-#include <QTimer>
 #include <QWidget>
+#include <QTimer>
 
 //设置太大会有问题，比如圆会卡一半，32x18就不会有问题
 class SwitchControl : public QWidget

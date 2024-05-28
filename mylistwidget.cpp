@@ -1,7 +1,8 @@
 #include "mylistwidget.h"
 #include "mouseevent.h"
-#include <QScrollBar>
 #include "json.h"
+
+#include <QScrollBar>
 #include <QLabel>
 #include <QDebug>
 
@@ -89,8 +90,7 @@ void MyListWidget::loadMoreItems()
             // 创建一个包含两个标签的QWidget容器
             QWidget *container = new QWidget();
             QVBoxLayout *layout = new QVBoxLayout(container);               // 使用垂直布局
-            layout->setContentsMargins(0, 0, 0, 0);                         // 设置布局的外边距为0
-            layout->setSpacing(0);                                          // 设置布局内各控件之间的间距为0
+            layout->setContentsMargins(0, 0, 0, 20);                        // 设置布局的外边距为0
 
             // 创建图片标签
             QLabel *imageLabel = new QLabel();

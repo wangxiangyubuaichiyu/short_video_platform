@@ -1,14 +1,15 @@
 #ifndef WIDGET_MAIN_H
 #define WIDGET_MAIN_H
 
+#include "switchcontrol.h"
+#include "AVPlay.h"
+#include "vilist.h"
+#include "json.h"
+
+#include <QWidget>
 #include <QLabel>
 #include <QPoint>
 #include <QTimer>
-#include <QWidget>
-#include "AVPlay.h"
-#include "switchcontrol.h"
-#include "vilist.h"
-#include "json.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

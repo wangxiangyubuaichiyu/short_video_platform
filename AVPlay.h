@@ -1,9 +1,11 @@
 #ifndef AVPLAY_H
 #define AVPLAY_H
 
+#include "PacketQueue.h"
+
 #include <QThread>
 #include <QImage>
-#include "PacketQueue.h"
+
 
 #define MAX_AUDIO_SIZE (1024*16*25*10)        //“Ù∆µ„–÷µ
 #define MAX_VIDEO_SIZE (1024*255*25*2)        // ”∆µ„–÷µ

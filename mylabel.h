@@ -1,8 +1,8 @@
 #ifndef MYLABEL_H
 #define MYLABEL_H
 
-#include <QLabel>
 #include <QObject>
+#include <QLabel>
 
 class Mylabel : public QLabel
 {

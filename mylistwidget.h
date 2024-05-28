@@ -1,13 +1,13 @@
 #ifndef MYLISTWIDGET_H
 #define MYLISTWIDGET_H
-
-#include <QWidget>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QVector>
 #include "vilist.h"
 #include "AVPlay.h"
+
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QVector>
+#include <QLabel>
 
 class MyListWidget : public QScrollArea
 {

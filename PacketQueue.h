@@ -1,5 +1,6 @@
 #ifndef PACKETQUEUE_H
 #define PACKETQUEUE_H
+
 #include "ffmpeg.h"
 
 struct PacketQueue
