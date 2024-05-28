@@ -11,6 +11,7 @@ public:
     Myslider(QWidget *parent = 0);
     ~Myslider();
     void mousePressEvent(QMouseEvent *ev)override;
+
 signals:
     void SIG_valueChanged(int);
 };

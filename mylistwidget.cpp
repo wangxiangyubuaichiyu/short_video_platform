@@ -1,4 +1,5 @@
 #include "mylistwidget.h"
+#include "mouseevent.h"
 #include <QScrollBar>
 #include "json.h"
 #include <QLabel>
@@ -6,6 +7,8 @@
 
 MyListWidget::MyListWidget(QWidget *parent) : QScrollArea(parent), len(0)
 {
+    player=new AVPlay;
+
     setWidgetResizable(true);                                       // 允许滚动区域根据内容自动调整大小
     containerWidget = new QWidget(this);                            // 在滚动区内创建容器小部件
     containerWidget->setStyleSheet("background: transparent;");     // 设置容器背景透明
@@ -25,7 +28,7 @@ MyListWidget::MyListWidget(QWidget *parent) : QScrollArea(parent), len(0)
 
 MyListWidget::~MyListWidget()
 {
-    // 目前为空，因为没有显式分配的资源需要释放
+    delete player;
 }
 
 // 添加项到列表中的函数
@@ -83,19 +86,59 @@ void MyListWidget::loadMoreItems()
     {
         for (int i = 0; i < columnCount; ++i)
         {
-            QLabel *label = new QLabel();                               // 创建新的标签
-            label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);       // 设置对齐方式
-            QSize newSize(itemWidth, t->FirstImage.size().height());    // 计算新的尺寸
+            // 创建一个包含两个标签的QWidget容器
+            QWidget *container = new QWidget();
+            QVBoxLayout *layout = new QVBoxLayout(container);               // 使用垂直布局
+            layout->setContentsMargins(0, 0, 0, 0);                         // 设置布局的外边距为0
+            layout->setSpacing(0);                                          // 设置布局内各控件之间的间距为0
+
+            // 创建图片标签
+            QLabel *imageLabel = new QLabel();
+            imageLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);         // 设置靠左上角对齐
+            QSize newSize(itemWidth, t->FirstImage.size().height());        // 计算新的尺寸
             t->FirstImage = t->FirstImage.scaled(newSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);  // 缩放图片
-            label->setPixmap(t->FirstImage);
-            label->setFixedSize(335,t->FirstImage.size().height()+50);
-            //label->setText(t->name);                                    // 设置文本内容
-            label->setStyleSheet("background-color: rgb(37,38,50); border-radius: 20px;");
-            addItemWidget(label);
+            imageLabel->setPixmap(t->FirstImage);
+            imageLabel->setFixedSize(335, t->FirstImage.size().height());
+
+            // 创建文本标签
+            QLabel *textLabel = new QLabel(t->name);                                     // 设置显示的文本
+            textLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);                       // 设置靠左上角对齐
+            textLabel->setStyleSheet("background-color: rgb(37,38,50); color: white;");  // 设置样式
+
+            // 将标签添加到布局中
+            layout->addWidget(imageLabel);
+            layout->addWidget(textLabel);
+
+            container->setLayout(layout);                                                       // 设置容器的布局
+            container->setStyleSheet("background-color: rgb(37,38,50); border-radius: 20px;");  // 设置容器样式
+            container->setFixedSize(335, t->FirstImage.size().height() + 50);                   // 设置固定大小
+
+            // 应用事件过滤器，并传递当前节点 t
+            MouseEvent *mouseevent = new MouseEvent(t);
+            container->installEventFilter(mouseevent);
+            container->setAttribute(Qt::WA_Hover);                                              // 启用悬停事件
+            addItemWidget(container);                                                           // 将容器添加到你的界面中
+            connect(mouseevent, &MouseEvent::hovered, this, &MyListWidget::disposehover);       // 设置播放
+            connect(mouseevent, &MouseEvent::mouseClicked, this, [&](VNode* clickedNode){       // 设置转到播放器
+                emit needopen(clickedNode);
+            });
             t = t->next;
         }
     }
     len = header->getNum();
+}
+
+
+void MyListWidget::disposehover(bool isHovering)
+{
+    if(isHovering)              //悬停
+    {
+
+    }
+    else                        //离去
+    {
+
+    }
 }
 
 // 处理窗口大小变化的事件

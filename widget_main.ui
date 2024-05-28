@@ -528,7 +528,7 @@
     </size>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="wdg_home">
     <property name="minimumSize">
@@ -549,7 +549,7 @@
        <x>0</x>
        <y>0</y>
        <width>1415</width>
-       <height>875</height>
+       <height>847</height>
       </rect>
      </property>
      <property name="minimumSize">
@@ -579,7 +579,7 @@
       <height>845</height>
      </size>
     </property>
-    <widget class="QLabel" name="lb_palyer">
+    <widget class="Mylabel" name="lb_palyer">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -748,7 +748,7 @@
        <number>20</number>
       </property>
       <property name="leftMargin">
-       <number>14</number>
+       <number>12</number>
       </property>
       <property name="topMargin">
        <number>0</number>
@@ -799,6 +799,19 @@
      </property>
      <property name="text">
       <string>00:00</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lb_pause">
+     <property name="geometry">
+      <rect>
+       <x>685</x>
+       <y>335</y>
+       <width>51</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -999,6 +1012,11 @@
    <class>MyListWidget</class>
    <extends>QListWidget</extends>
    <header>mylistwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Mylabel</class>
+   <extends>QLabel</extends>
+   <header location="global">mylabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -305,6 +305,7 @@ void AVPlay::run()
     m_videoState.readThreadFinished = true;
     //视频自动结束 置标志位
     m_playerState = PlayerState::Stop;
+    emit finished();
 }
 
 void AVPlay::SetFilePath(QString path)
@@ -328,18 +329,6 @@ void AVPlay::pause()
     m_videoState.isPause = true;
     if( m_playerState != Playing ) return;
     m_playerState = Pause;
-}
-
-double AVPlay::getCurrentTime()
-{
-    return m_videoState.audio_clock;
-}
-
-int64_t AVPlay::getTotalTime()
-{
-    if( m_videoState.pFormatCtx )
-        return m_videoState.pFormatCtx->duration;
-    return -1;
 }
 
 void AVPlay::stop(bool isWait)
@@ -367,7 +356,19 @@ void AVPlay::stop(bool isWait)
         m_videoState.audioID = 0;
     }
     m_playerState = PlayerState::Stop;
-    Q_EMIT SIG_PlayerStateChanged(PlayerState::Stop);
+    emit SIG_PlayerStateChanged(PlayerState::Stop);
+}
+
+double AVPlay::getCurrentTime()
+{
+    return m_videoState.audio_clock;
+}
+
+int64_t AVPlay::getTotalTime()
+{
+    if( m_videoState.pFormatCtx )
+        return m_videoState.pFormatCtx->duration;
+    return -1;
 }
 
 void AVPlay::SendGetOneImage(QImage img)

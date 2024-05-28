@@ -27,6 +27,8 @@ SOURCES += \
     json.cpp \
     main.cpp \
     Widget_Main.cpp \
+    mouseevent.cpp \
+    mylabel.cpp \
     mylistwidget.cpp \
     myslider.cpp \
     switchcontrol.cpp \
@@ -38,6 +40,8 @@ HEADERS += \
     Widget_Main.h \
     ffmpeg.h \
     json.h \
+    mouseevent.h \
+    mylabel.h \
     mylistwidget.h \
     myslider.h \
     switchcontrol.h \

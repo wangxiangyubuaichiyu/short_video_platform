@@ -18,8 +18,13 @@ Widget_Main::Widget_Main(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    //初始化变量
+    m_play=new AVPlay;
+    m_list=new ViList;
+    m_js=new Json;
 
+    //设置界面样式
+    ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);        // 隐藏标题栏和边框
     setMouseTracking(true);                         // 启用鼠标跟踪
     ui->search->setMouseTracking(true);             //当有多个控件的时候需要所有控件都要设置跟踪，否则不好使
@@ -35,7 +40,7 @@ Widget_Main::Widget_Main(QWidget *parent)
 
     //投稿 上面图案下面文字
     ui->btn_contribute->setIcon(QIcon(":/image/contribute2.png"));
-    ui->btn_contribute->setText(QString::fromLocal8Bit("投稿"));             //如果是乱码就会显示 ...
+    ui->btn_contribute->setText(QString::fromLocal8Bit("投稿"));                      //如果是乱码就会显示 ...
     ui->btn_contribute->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     //home 左边图案右边文字
     ui->btn_home->setIcon(QIcon(":/image/home.png"));
@@ -71,30 +76,41 @@ Widget_Main::Widget_Main(QWidget *parent)
     pixmap = pixmap.transformed(QTransform().rotate(180));       //创建旋转图标并旋转90度
     icon.addPixmap(pixmap);
     ui->lb_on->setIcon(icon);
+    //设置大的暂停按钮
+    QPixmap pixmapn(":/image/Play _big.png");
+    pixmapn = pixmapn.scaled(QSize(64, 64), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->lb_pause->setPixmap(pixmapn);
+    ui->lb_pause->resize(pixmapn.size());                        // 调整 QLabel 大小以适应图片
 
-    slot_PlayerStateChanged(AVPlay::PlayerState::Stop);          //初始化状态
     //连接槽函数
-    m_play=new AVPlay;
-    connect(m_play, &AVPlay::SIG_GetOneImage, this, &Widget_Main::SLT_show); //连接播放器
-    connect(m_play,&AVPlay::SIG_PlayerStateChanged,this,&Widget_Main::slot_PlayerStateChanged);
-    connect(m_play,&AVPlay::SIG_TotalTime,this,&Widget_Main::slot_getTotalTime);
-    connect(ui->sl_progree ,&Myslider::SIG_valueChanged,this,&Widget_Main::slot_videoSliderValueChanged);
-    connect(&m_timer,&QTimer::timeout,this,&Widget_Main::slot_TimerTimeOut);
-    m_timer.setInterval(500);                                                 //超时时间500ms
-    m_list=new ViList;
-    m_js=new Json;
     connect(m_js,&Json::dataEncoded,this,&Widget_Main::sendDate);               //封装好数据要发送给服务端
     connect(m_js,&Json::dataDecoded,this,&Widget_Main::addList);                //解析好数据要放到链表中
-    //加载视频需要4的倍数
-    for(int i=1;i<=20;i++)//测试性放12个url
-    {
-        m_js->decodeData(QString("{\"url\":\"rtmp://192.168.194.131:1935/vod/%1.mp4\"}").arg(i));
-    }
+    connect(m_play, &AVPlay::SIG_GetOneImage, this, &Widget_Main::SLT_show);    //连接播放器
+    connect(m_play,&AVPlay::SIG_PlayerStateChanged,this,&Widget_Main::slot_PlayerStateChanged);
+    connect(m_play,&AVPlay::SIG_TotalTime,this,&Widget_Main::slot_getTotalTime);
+    connect(m_play,&AVPlay::finished,this,&Widget_Main::playMode);
+    connect(&m_timer,&QTimer::timeout,this,&Widget_Main::slot_TimerTimeOut);
+    connect(ui->sl_progree ,&Myslider::SIG_valueChanged,this,&Widget_Main::slot_videoSliderValueChanged);
+    connect(ui->lb_palyer,&Mylabel::clicked,this,[&](){on_btn_open_clicked();});
+    connect(ui->lw_recommendlist,&MyListWidget::needopen,this,&Widget_Main::home2Open);
+    connect(ui->btn_conopen,&SwitchControl::toggled,this,[&](bool is){m_playmode=is;});
     //先加载控件再运行主程序的，所以刚加载的时候MyListWidget::header是空的，所以放到主窗口进行初始化。
     connect(ui->lw_recommendlist,&MyListWidget::getList,this,[&](ViList*& list){//获取到链表
         list=m_list;
     });
-    ui->lw_recommendlist->loadMoreItems();
+
+    m_timer.setInterval(500);                                                    //超时时间500ms
+    //加载视频需要4的倍数
+    for(int i=1;i<=20;i++)//测试性放20个url
+    {
+        m_js->decodeData(QString("{\"url\":\"rtmp://192.168.194.131:1935/vod/%1.mp4\"}").arg(i));
+    }
+
+    //设置初始化状态
+    slot_PlayerStateChanged(AVPlay::PlayerState::Stop);          // 初始化播放状态
+    ui->lw_recommendlist->loadMoreItems();                       // 设置好主页开始时视频
+    m_NowNode=m_list->check(0);                                  // 给第一个视频地址
+    ui->lb_pause->hide();
 }
 
 Widget_Main::~Widget_Main()
@@ -326,7 +342,15 @@ void Widget_Main::addList(const QMap<QString, QVariant> &data)
     QString url=data["url"].toString();
     VNode* p=new VNode;
     p->url=url;
+
+    //获取名字，并且进行字符截取
     p->name=getFilename(url);
+    int lastDotIndex = p->name.lastIndexOf('.');               // 查找最后一个点号的位置
+    if (lastDotIndex != -1)                                    // 如果找到了点号
+    {
+        p->name = p->name.left(lastDotIndex);                  // 截断到点号之前
+    }
+
     p->FirstImage=QPixmap::fromImage(getFirstImage(url));
     p->FirstImage = roundImage(p->FirstImage, 20);             // 20为圆角半径
     p->Id=num++;
@@ -339,38 +363,76 @@ void Widget_Main::sendDate(const QString &json)
     //qDebug() << json;
 }
 
+void Widget_Main::home2Open(VNode*& t)
+{
+    //将界面清空
+    SLT_show(t->FirstImage.toImage());
+    m_NowNode=t;
+
+    if(m_play->playerState()==AVPlay::PlayerState::Stop)
+    {
+        m_play->SetFilePath(t->url);
+        //切换状态
+        slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+    }
+    else
+    {
+        m_play->stop(true);
+        m_play->SetFilePath(t->url);
+        //切换状态
+        slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+    }
+    // 跳转到播放界面
+    on_btn_play_clicked();
+}
+
+void Widget_Main::playMode()
+{
+    //播放完成后关闭界面
+    m_play->stop(true);
+    slot_PlayerStateChanged(AVPlay::PlayerState::Stop);
+
+    if(m_playmode)
+    {
+        if(m_NowNode->next==NULL)
+        {
+            // 添加节点
+            emit getListNode();
+        }
+        m_NowNode=m_NowNode->next;
+    }
+    m_play->SetFilePath(m_NowNode->url);
+    //切换状态
+    slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+}
+
 void Widget_Main::slot_PlayerStateChanged(int state)
 {
     switch( state )
     {
-    case AVPlay::PlayerState::Pause:
-    {
-        ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
-        m_timer.stop();
-        this->update();
-        isStop = true;
-        break;
+        case AVPlay::PlayerState::Pause:
+        {
+            ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
+            m_timer.stop();           
+            break;
+        }
+        case AVPlay::PlayerState::Stop:
+        {
+            ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
+            m_timer.stop();
+            ui->sl_progree->setValue(0);
+            ui->lb_totalTime->setText("/00:00");
+            ui->lb_currentTime->setText("00:00");
+            break;
+        }
+        case AVPlay::PlayerState::Playing:
+        {
+            ui->btn_open->setIcon(QIcon(":/image/stop.png"));
+            m_timer.start();
+            break;
+        }
     }
-    case AVPlay::PlayerState::Stop:
-    {
-        ui->btn_open->setIcon(QIcon(":/image/Play _big.png"));
-        m_timer.stop();
-        ui->sl_progree->setValue(0);
-        ui->lb_totalTime->setText("/00:00");
-        ui->lb_currentTime->setText("00:00");
-        this->update();
-        isStop = true;
-        break;
-    }
-    case AVPlay::PlayerState::Playing:
-    {
-        ui->btn_open->setIcon(QIcon(":/image/stop.png"));
-        m_timer.start();
-        this->update();
-        isStop = false;
-        break;
-    }
-    }
+    this->update();
 }
 
 void Widget_Main::slot_getTotalTime(qint64 uSec)
@@ -450,6 +512,11 @@ void Widget_Main::on_btn_home_clicked()
     ui->btn_home->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
     ui->btn_play->setStyleSheet("background-color: transparent;");
     ui->btn_user->setStyleSheet("background-color: transparent;");
+    if(m_play->playerState()==AVPlay::PlayerState::Playing)
+    {
+        m_play->pause();
+        slot_PlayerStateChanged(AVPlay::PlayerState::Pause);
+    }
 }
 
 void Widget_Main::on_btn_play_clicked()
@@ -458,6 +525,17 @@ void Widget_Main::on_btn_play_clicked()
     ui->btn_play->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
     ui->btn_home->setStyleSheet("background-color: transparent;");
     ui->btn_user->setStyleSheet("background-color: transparent;");
+    if(m_play->playerState()==AVPlay::PlayerState::Pause)
+    {
+        m_play->play();
+        slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+    }
+    else if(m_play->playerState()==AVPlay::PlayerState::Stop)
+    {
+        m_play->SetFilePath(m_NowNode->url);
+        //切换状态
+        slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+    }
 }
 
 void Widget_Main::on_btn_user_clicked()
@@ -466,27 +544,29 @@ void Widget_Main::on_btn_user_clicked()
     ui->btn_user->setStyleSheet("background-color: rgb(48, 41, 53);color: white;");
     ui->btn_play->setStyleSheet("background-color: transparent;");
     ui->btn_home->setStyleSheet("background-color: transparent;");
+    if(m_play->playerState()==AVPlay::PlayerState::Playing)
+    {
+        m_play->pause();
+        slot_PlayerStateChanged(AVPlay::PlayerState::Pause);
+    }
 }
 
 void Widget_Main::on_btn_open_clicked()
 {
-    //如果是暂停，或者停止(没有文件加载)
-    if(m_play->playerState()==AVPlay::PlayerState::Pause||m_play->playerState()==AVPlay::PlayerState::Stop)
+    //如果是暂停
+    if(m_play->playerState()==AVPlay::PlayerState::Pause)
     {
         m_play->play();
-        if(m_play->playerState()==AVPlay::PlayerState::Stop)
-        {
-            //m_play->SetFilePath("E:\\Documents\\02.mp4");    //用于测试 后期连播等，需要重写
-            m_play->SetFilePath("rtmp://192.168.194.131:1935/vod/10.mp4");//点播
-        }
         //切换状态
         slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+        ui->lb_pause->hide();
     }
     else if(m_play->playerState()==AVPlay::PlayerState::Playing)
     {
        m_play->pause();
        //切换状态
        slot_PlayerStateChanged(AVPlay::PlayerState::Pause);
+       ui->lb_pause->show();
     }
 }
 
@@ -495,3 +575,31 @@ void Widget_Main::on_btn_set_clicked()
     QMessageBox::about(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("设置界面仍处于更新状态，后续可能会进行完成，也可能不了了之了"));
 }
 
+void Widget_Main::on_lb_on_clicked()
+{
+    if(m_NowNode->Id==0)return;
+
+    m_play->stop(true);
+    slot_PlayerStateChanged(AVPlay::PlayerState::Stop);
+
+    m_NowNode=m_list->check(m_NowNode->Id-1);
+    m_play->SetFilePath(m_NowNode->url);
+    //切换状态
+    slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+}
+
+void Widget_Main::on_lb_down_clicked()
+{
+    m_play->stop(true);
+    slot_PlayerStateChanged(AVPlay::PlayerState::Stop);
+
+    if(m_NowNode->next==NULL)
+    {
+       // 添加节点
+       emit getListNode();
+    }
+    m_NowNode=m_NowNode->next;
+    m_play->SetFilePath(m_NowNode->url);
+    //切换状态
+    slot_PlayerStateChanged(AVPlay::PlayerState::Playing);
+}

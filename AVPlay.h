@@ -83,23 +83,24 @@ public:
     void pause();
     void stop( bool isWait);
 
-    int64_t getTotalTime();             //获取总时间
-    double getCurrentTime();            //获取当前时间
-    void seek(int64_t pos);             //跳转
+    int64_t getTotalTime();                         // 获取总时间
+    double getCurrentTime();                        // 获取当前时间
+    void seek(int64_t pos);                         // 跳转
     PlayerState playerState() const;
 
 signals:
-    void SIG_GetOneImage(QImage);                    //发给控件帧图片
+    void SIG_GetOneImage(QImage);                    // 发给控件帧图片
     void finished();                                 // 信号可以在线程完成后发出
-    void SIG_PlayerStateChanged(PlayerState);        //发送更改状态信号
-    void SIG_TotalTime(qint64 uSec);                 //发送时间信号
+    void SIG_PlayerStateChanged(PlayerState);        // 发送更改状态信号
+    void SIG_TotalTime(qint64 uSec);                 // 发送时间信号
+
 public slots:
-    void SendGetOneImage(QImage img);                //发送每一帧图片
+    void SendGetOneImage(QImage img);                // 发送每一帧图片
 
 private:
     VideoState m_videoState;
     QString m_fileName;
-    PlayerState m_playerState;                      //播放状态标志位
+    PlayerState m_playerState;                       // 播放状态标志位
 };
 
 #endif // AVPLAY_H
